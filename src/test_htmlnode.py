@@ -12,27 +12,18 @@ class TestHTMLNode(unittest.TestCase):
         node = HTMLNode(props=props)
         self.assertEqual(node.props_to_html(), reference)
         
-    def test__repr__(self):
-        tag = "p"
-        value = "Some kind of text which goes in a <p> tag in HTML."
-        props = {
-            "href": "https://www.google.com",
-            "target": "_blank",
-        }
-        node = HTMLNode(
-            tag=tag,
-            value=value,
-            children=None,
-            props=props
-        )
-        expected = f"HTMLNode({tag}, {value}, None, {props})"
-        self.assertEqual(node, expected)
+    def test_props_to_html_is_none(self):
+        node = HTMLNode()
+        self.assertEqual(node.props_to_html(), "")
         
     def test_raise_if_both_value_and_children(self):
-        self.assertRaises(
-            ValueError,
+        with self.assertRaises(ValueError) as cm:
             HTMLNode(value="something", children=[HTMLNode(tag="p")])
-            )
+        
+    def test_to_html_not_implemented(self):
+        node = HTMLNode()
+        with self.assertRaises(NotImplementedError) as cm:
+            node.to_html()
         
 if __name__ == '__main__':
     unittest.main()

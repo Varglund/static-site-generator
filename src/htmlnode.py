@@ -14,13 +14,15 @@ class HTMLNode:
         self.value = value
         self.children = children
         self.props = props
-        if self.value & self.children:
+        if (self.value!=None) & (self.children!=None):
             raise ValueError("Cannot have both a value and children, they are mutually exclusive.")
 
     def to_html(self):
         raise NotImplementedError
     
     def props_to_html(self):
+        if not self.props:
+            return ""
         html=""
         for prop, value in self.props.items():
             html += f' {prop}="{value}"'
