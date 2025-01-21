@@ -25,6 +25,9 @@ class ParentNode(HTMLNode):
             output += node.to_html()
         output += f"</{self.tag}>"
         return output
+    
+    def __repr__(self):
+        return f'ParentNode("{self.tag}", {self.children}, {self.props})'
         
 def main():
     x = LeafNode("p","some string value", props={"somekey":"somevalue"})
