@@ -22,10 +22,7 @@ class ParentNode(HTMLNode):
             raise ValueError("All parent nodes _must_ have children.")
         output = f"<{self.tag}{self.props_to_html()}>"
         for node in self.children:
-            if isinstance(node, LeafNode):
-                output += node.to_html()
-            elif isinstance(node, ParentNode):
-                output += node.to_html()
+            output += node.to_html()
         output += f"</{self.tag}>"
         return output
         
