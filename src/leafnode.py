@@ -1,3 +1,4 @@
+from __future__ import annotations
 from htmlnode import HTMLNode
 from typing import Union, Optional, Dict
 
@@ -23,6 +24,12 @@ class LeafNode(HTMLNode):
     
     def __repr__(self):
         return f'LeafNode("{self.tag}", "{self.value}", {self.props})'
+    
+    def __eq__(self, other: LeafNode):
+        same_tag = (self.tag == other.tag)
+        same_value = (self.value == other.value)
+        same_props = (self.props == other.props)
+        return same_tag & same_value & same_props
         
 def main():
     x = LeafNode("p","some string value", props={"somekey":"somevalue"})
