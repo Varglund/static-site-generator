@@ -2,7 +2,7 @@ import unittest
 
 from text_to_html import text_node_to_html_node
 from textnode import TextNode, TextType
-from leafnode import LeafNode
+from htmlnode import LeafNode
 
 class TestTextNodeToHtmlNode(unittest.TestCase):
     def test_case_normal_text(self):

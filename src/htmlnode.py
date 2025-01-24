@@ -31,9 +31,71 @@ class HTMLNode:
     def __repr__(self):
         return f'HTMLNode("{self.tag}", "{self.value}", {self.children}, {self.props})'
     
+
+class LeafNode(HTMLNode):
+    def __init__(
+        self,
+        tag: Union[str,None],
+        value: str,
+        props: Optional[Dict] = None,
+    ):
+        super().__init__(
+            tag=tag,
+            value=value,
+            props=props
+        )
+    
+    def to_html(self):
+        if not self.value:
+            raise ValueError("All leaf nodes _must_ have a value.")
+        if not self.tag:
+            return self.value
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+    
+    def __repr__(self):
+        return f'LeafNode("{self.tag}", "{self.value}", {self.props})'
+    
+    def __eq__(self, other: LeafNode):
+        same_tag = (self.tag == other.tag)
+        same_value = (self.value == other.value)
+        same_props = (self.props == other.props)
+        return same_tag & same_value & same_props
+
+
+class ParentNode(HTMLNode):
+    def __init__(
+        self,
+        tag: str,
+        children: List[HTMLNode],
+        props: Optional[Dict] = None,
+    ):
+        super().__init__(
+            tag=tag,
+            children=children,
+            props=props,
+        )
+    
+    def to_html(self):
+        if not self.tag:
+            raise ValueError("All parent nodes _must_ have a tag.")
+        if not self.children or len(self.children)==0:
+            raise ValueError("All parent nodes _must_ have children.")
+        output = f"<{self.tag}{self.props_to_html()}>"
+        for node in self.children:
+            output += node.to_html()
+        output += f"</{self.tag}>"
+        return output
+    
+    def __repr__(self):
+        return f'ParentNode("{self.tag}", {self.children}, {self.props})'
+    
 def main():
-    x = HTMLNode(props={"href": "https://www.google.com", "target": "_blank",})
-    print(x.props_to_html())
+    node = HTMLNode(props={"href": "https://www.google.com", "target": "_blank",})
+    print(f"{node.props_to_html()=}")
+    leaf = LeafNode("p","some string value", props={"somekey":"somevalue"})
+    print(f"{leaf=}")
+    parent = ParentNode("code",[leaf, leaf])
+    print(f"{parent=}")
     
 if __name__=="__main__":
     main()
