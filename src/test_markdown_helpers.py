@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
-from split_node import split_nodes_delimiter, Delimiter, split_all_nodes
+from markdown_helpers import split_nodes_delimiter, Delimiter, extract_markdown_images
 
 class TestSplitNode(unittest.TestCase):
     def test_split_code(self):
@@ -67,19 +67,11 @@ class TestSplitNode(unittest.TestCase):
             node = TextNode("This is text with a poorly formatted *italic word", TextType.NORMAL_TEXT)
             split_nodes_delimiter([node], Delimiter.ITALIC, TextType.ITALIC_TEXT)
     
-    # def test_split_multiple_bold(self):
-    #     node = TextNode("This is text with **bold stuff**, *italics stuff*, and `code blocks` to separate out.", TextType.NORMAL_TEXT)
-    #     new_nodes = split_nodes_delimiter([node, node, node], Delimiter.BOLD, TextType.BOLD_TEXT)
-    #     expected = [
-    #         TextNode("This is text with ", TextType.NORMAL_TEXT),
-    #         TextNode("bold stuff", TextType.BOLD_TEXT),
-    #         TextNode(", ", TextType.NORMAL_TEXT),
-    #         TextNode("italics stuff", TextType.ITALIC_TEXT),
-    #         TextNode(", and ", TextType.NORMAL_TEXT),
-    #         TextNode("code blocks", TextType.CODE_TEXT),
-    #         TextNode(" to separate out.", TextType.NORMAL_TEXT),
-    #     ]
-    #     self.assertEqual(new_nodes, expected)
+    def test_extract_markdown_images(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        output = extract_markdown_images(text)
+        expected = [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
+        self.assertEqual(output, expected)
             
             
         

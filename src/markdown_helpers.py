@@ -1,6 +1,7 @@
 from textnode import TextNode, TextType
-from typing import List
+from typing import List, Tuple, Optional
 from enum import Enum
+import re
 
 class Delimiter(Enum):
     ITALIC = "*"
@@ -30,8 +31,10 @@ def split_nodes_delimiter(old_nodes: List[TextNode], delimiter: Delimiter, text_
             raise ValueError(f"Text '{node.text}' only contained one copy of {delimiter.value=}")
     return new_nodes
 
-def split_all_nodes(old_nodes: List[TextNode])->List[TextNode]:
-    bolds = split_nodes_delimiter(old_nodes, Delimiter.BOLD, TextType.BOLD_TEXT)
-    italics = split_nodes_delimiter(bolds, Delimiter.ITALIC, TextType.ITALIC_TEXT)
-    codes = split_nodes_delimiter(italics, Delimiter.CODE, TextType.CODE_TEXT)
-    return codes
+def extract_markdown_images(text: str)->Optional[List[Tuple[str,str]]]:
+    if not text:
+        return None
+    # pattern = re.compile(r"![rick roll](https://i.imgur.com/aKaOqIh.gif)")
+    # pattern = re.compile(r"!\[(.*?)\]\((https?://w+\.w+\.w+/w+\.w+)\)")
+    pattern = re.compile(r"!\[(.*?)\]\((https://.*?)\)")
+    return re.findall(pattern, text)
