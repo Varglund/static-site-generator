@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
-from markdown_helpers import split_nodes_delimiter, Delimiter, extract_markdown_images ,extract_markdown_links, split_nodes_link#, split_nodes_image
+from markdown_helpers import split_nodes_delimiter, Delimiter, extract_markdown_images ,extract_markdown_links, split_nodes_link, split_nodes_image
 
 class TestSplitNode(unittest.TestCase):
     def test_split_code(self):
@@ -160,21 +160,82 @@ class TestSplitNode(unittest.TestCase):
         ]
         self.assertEqual(new_nodes, expected)
         
-    # def test_split_nodes_image(self):
-    #     node = TextNode(
-    #         "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif)",# and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)",
-    #         TextType.NORMAL_TEXT,
-    #     )
-    #     new_nodes = split_nodes_image([node])
-    #     expected =  [
-    #         TextNode("This is text with a ", TextType.NORMAL_TEXT),
-    #         TextNode("rick roll", TextType.IMAGE, "https://i.imgur.com/aKaOqIh.gif"),
-    #         # TextNode(" and ", TextType.TEXT),
-    #         # TextNode(
-    #         #     "to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"
-    #         # ),
-    #     ]
-    #     self.assertEqual(new_nodes, expected)
+    def test_split_nodes_image(self):
+        node = TextNode(
+            "This is text with an image ![rick roll](https://i.imgur.com/aKaOqIh.gif)",
+            TextType.NORMAL_TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        expected =  [
+            TextNode("This is text with an image ", TextType.NORMAL_TEXT),
+            TextNode("rick roll", TextType.IMAGE, "https://i.imgur.com/aKaOqIh.gif"),
+        ]
+        self.assertEqual(new_nodes, expected)
+    
+    def test_split_nodes_beginning_image(self):
+        node = TextNode(
+            "![rick roll](https://i.imgur.com/aKaOqIh.gif) is text with an image.",
+            TextType.NORMAL_TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        expected =  [
+            TextNode("rick roll", TextType.IMAGE, "https://i.imgur.com/aKaOqIh.gif"),
+            TextNode(" is text with an image.", TextType.NORMAL_TEXT),
+        ]
+        self.assertEqual(new_nodes, expected)
+    
+    def test_split_nodes_only_image(self):
+        node = TextNode(
+            "![rick roll](https://i.imgur.com/aKaOqIh.gif)",
+            TextType.NORMAL_TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        expected =  [
+            TextNode("rick roll", TextType.IMAGE, "https://i.imgur.com/aKaOqIh.gif"),
+        ]
+        self.assertEqual(new_nodes, expected)
+    
+    def test_split_nodes_image_with_trailing_text(self):
+        node = TextNode(
+            "This is text with an image ![rick roll](https://i.imgur.com/aKaOqIh.gif) and something at the end.",
+            TextType.NORMAL_TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        expected =  [
+            TextNode("This is text with an image ", TextType.NORMAL_TEXT),
+            TextNode("rick roll", TextType.IMAGE, "https://i.imgur.com/aKaOqIh.gif"),
+            TextNode(" and something at the end.", TextType.NORMAL_TEXT),
+        ]
+        self.assertEqual(new_nodes, expected)
+    
+    def test_split_nodes_multiple_images(self):
+        node = TextNode(
+            "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)",
+            TextType.NORMAL_TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        expected =  [
+            TextNode("This is text with a ", TextType.NORMAL_TEXT),
+            TextNode("rick roll", TextType.IMAGE, "https://i.imgur.com/aKaOqIh.gif"),
+            TextNode(" and ", TextType.NORMAL_TEXT),
+            TextNode("obi wan", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+        ]
+        self.assertEqual(new_nodes, expected)
+        
+    def test_split_nodes_multiple_images_with_trailing_text(self):
+        node = TextNode(
+            "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg) and an end.",
+            TextType.NORMAL_TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        expected =  [
+            TextNode("This is text with a ", TextType.NORMAL_TEXT),
+            TextNode("rick roll", TextType.IMAGE, "https://i.imgur.com/aKaOqIh.gif"),
+            TextNode(" and ", TextType.NORMAL_TEXT),
+            TextNode("obi wan", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and an end.", TextType.NORMAL_TEXT),
+        ]
+        self.assertEqual(new_nodes, expected)
         
 
 if __name__ == '__main__':

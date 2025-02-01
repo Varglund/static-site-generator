@@ -78,18 +78,35 @@ def split_nodes_link(old_nodes: List[TextNode]):
                 )
     return new_nodes
 
-# def split_nodes_image(old_nodes: List[TextNode]):
-#     if not old_nodes:
-#         raise ValueError("no nodes provided")
-#     new_nodes = []
-#     for node in old_nodes:
-#         matches = extract_markdown_images(node.text)
-#         if not matches:
-#             new_nodes.append(node)
-#             continue
-#         new_nodes.extend([
-#             TextNode(fragments[0],TextType.NORMAL_TEXT),
-#             TextNode(fragments[1], text_type),
-#             TextNode(fragments[2],TextType.NORMAL_TEXT),
-#         ])
-#     return new_nodes
+def split_nodes_image(old_nodes: List[TextNode]):
+    if not old_nodes:
+        raise ValueError("no nodes provided")
+    new_nodes = []
+    for node in old_nodes:
+        line = node.text
+        images = extract_markdown_images(node.text)
+        if not images:
+            new_nodes.append(node)
+            continue
+        for image in images: 
+            start = line.index(image[0]) - 2
+            end = line.index(image[1]) + len(image[1])
+            if start==0:
+                new_nodes.extend([
+                    TextNode(image[0], TextType.IMAGE, image[1]),
+                ])
+            else:
+                new_nodes.extend([
+                    TextNode(line[:start],TextType.NORMAL_TEXT),
+                    TextNode(image[0], TextType.IMAGE, image[1]),
+                ])
+            if (end+1)<len(line):
+                line = line[end+1:]
+            else:
+                line = ""
+        else:
+            if line:
+                new_nodes.append(
+                    TextNode(line,TextType.NORMAL_TEXT)
+                )
+    return new_nodes
