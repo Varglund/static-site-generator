@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
-from markdown_helpers import split_nodes_delimiter, Delimiter, extract_markdown_images
+from markdown_helpers import split_nodes_delimiter, Delimiter, extract_markdown_images ,extract_markdown_links, split_nodes_link#, split_nodes_image
 
 class TestSplitNode(unittest.TestCase):
     def test_split_code(self):
@@ -72,8 +72,109 @@ class TestSplitNode(unittest.TestCase):
         output = extract_markdown_images(text)
         expected = [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
         self.assertEqual(output, expected)
-            
-            
+    
+    def test_extract_markdown_links(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        output = extract_markdown_links(text)
+        expected = [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")]
+        self.assertEqual(output, expected)
+        
+    def test_split_nodes_link(self):
+        node = TextNode(
+            "This is text with a link [to boot dev](https://www.boot.dev)",
+            TextType.NORMAL_TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        expected =  [
+            TextNode("This is text with a link ", TextType.NORMAL_TEXT),
+            TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
+        ]
+        self.assertEqual(new_nodes, expected)
+    
+    def test_split_nodes_beginning_link(self):
+        node = TextNode(
+            "[To boot dev](https://www.boot.dev) is text with a link ",
+            TextType.NORMAL_TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        expected =  [
+            TextNode("To boot dev", TextType.LINK, "https://www.boot.dev"),
+            TextNode(" is text with a link ", TextType.NORMAL_TEXT),
+        ]
+        self.assertEqual(new_nodes, expected)
+    
+    def test_split_nodes_only_link(self):
+        node = TextNode(
+            "[to boot dev](https://www.boot.dev)",
+            TextType.NORMAL_TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        expected =  [
+            TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
+        ]
+        self.assertEqual(new_nodes, expected)
+    
+    def test_split_nodes_link_with_trailing_text(self):
+        node = TextNode(
+            "This is text with a link [to boot dev](https://www.boot.dev) and something at the end.",
+            TextType.NORMAL_TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        expected =  [
+            TextNode("This is text with a link ", TextType.NORMAL_TEXT),
+            TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
+            TextNode(" and something at the end.", TextType.NORMAL_TEXT),
+        ]
+        self.assertEqual(new_nodes, expected)
+    
+    def test_split_nodes_multiple_links(self):
+        node = TextNode(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
+            TextType.NORMAL_TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        expected =  [
+            TextNode("This is text with a link ", TextType.NORMAL_TEXT),
+            TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
+            TextNode(" and ", TextType.NORMAL_TEXT),
+            TextNode(
+                "to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"
+            ),
+        ]
+        self.assertEqual(new_nodes, expected)
+        
+    def test_split_nodes_multiple_links_with_trailing_text(self):
+        node = TextNode(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev) and an end.",
+            TextType.NORMAL_TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        expected =  [
+            TextNode("This is text with a link ", TextType.NORMAL_TEXT),
+            TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
+            TextNode(" and ", TextType.NORMAL_TEXT),
+            TextNode(
+                "to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"
+            ),
+            TextNode(" and an end.", TextType.NORMAL_TEXT),
+        ]
+        self.assertEqual(new_nodes, expected)
+        
+    # def test_split_nodes_image(self):
+    #     node = TextNode(
+    #         "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif)",# and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)",
+    #         TextType.NORMAL_TEXT,
+    #     )
+    #     new_nodes = split_nodes_image([node])
+    #     expected =  [
+    #         TextNode("This is text with a ", TextType.NORMAL_TEXT),
+    #         TextNode("rick roll", TextType.IMAGE, "https://i.imgur.com/aKaOqIh.gif"),
+    #         # TextNode(" and ", TextType.TEXT),
+    #         # TextNode(
+    #         #     "to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"
+    #         # ),
+    #     ]
+    #     self.assertEqual(new_nodes, expected)
         
 
 if __name__ == '__main__':

@@ -34,7 +34,62 @@ def split_nodes_delimiter(old_nodes: List[TextNode], delimiter: Delimiter, text_
 def extract_markdown_images(text: str)->Optional[List[Tuple[str,str]]]:
     if not text:
         return None
-    # pattern = re.compile(r"![rick roll](https://i.imgur.com/aKaOqIh.gif)")
-    # pattern = re.compile(r"!\[(.*?)\]\((https?://w+\.w+\.w+/w+\.w+)\)")
-    pattern = re.compile(r"!\[(.*?)\]\((https://.*?)\)")
-    return re.findall(pattern, text)
+    # pattern = re.compile(r"!\[(.*?)\]\((https://.*?)\)")  # mine
+    pattern = re.compile(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)")  # boot.dev
+    return pattern.findall(text)
+
+def extract_markdown_links(text: str)->Optional[List[Tuple[str,str]]]:
+    if not text:
+        return None
+    # pattern = re.compile(r"\[(.*?)\]\((https://.*?)\)")  # mine
+    pattern = re.compile(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)")  # boot.dev
+    return pattern.findall(text)
+
+def split_nodes_link(old_nodes: List[TextNode]):
+    if not old_nodes:
+        raise ValueError("no nodes provided")
+    new_nodes = []
+    for node in old_nodes:
+        line = node.text
+        links = extract_markdown_links(node.text)
+        if not links:
+            new_nodes.append(node)
+            continue
+        for link in links: 
+            start = line.index(link[0]) -1
+            end = line.index(link[1]) + len(link[1])
+            if start==0:
+                new_nodes.extend([
+                    TextNode(link[0], TextType.LINK, link[1]),
+                ])
+            else:
+                new_nodes.extend([
+                    TextNode(line[:start],TextType.NORMAL_TEXT),
+                    TextNode(link[0], TextType.LINK, link[1]),
+                ])
+            if (end+1)<len(line):
+                line = line[end+1:]
+            else:
+                line = ""
+        else:
+            if line:
+                new_nodes.append(
+                    TextNode(line,TextType.NORMAL_TEXT)
+                )
+    return new_nodes
+
+# def split_nodes_image(old_nodes: List[TextNode]):
+#     if not old_nodes:
+#         raise ValueError("no nodes provided")
+#     new_nodes = []
+#     for node in old_nodes:
+#         matches = extract_markdown_images(node.text)
+#         if not matches:
+#             new_nodes.append(node)
+#             continue
+#         new_nodes.extend([
+#             TextNode(fragments[0],TextType.NORMAL_TEXT),
+#             TextNode(fragments[1], text_type),
+#             TextNode(fragments[2],TextType.NORMAL_TEXT),
+#         ])
+#     return new_nodes
