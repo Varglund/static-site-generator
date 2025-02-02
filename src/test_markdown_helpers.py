@@ -1,7 +1,15 @@
 import unittest
 
 from textnode import TextNode, TextType
-from markdown_helpers import split_nodes_delimiter, Delimiter, extract_markdown_images ,extract_markdown_links, split_nodes_link, split_nodes_image
+from markdown_helpers import (
+    split_nodes_delimiter,
+    Delimiter,
+    extract_markdown_images,
+    extract_markdown_links,
+    split_nodes_link,
+    split_nodes_image,
+    text_to_textnodes,
+)
 
 class TestSplitNode(unittest.TestCase):
     def test_split_code(self):
@@ -236,7 +244,24 @@ class TestSplitNode(unittest.TestCase):
             TextNode(" and an end.", TextType.NORMAL_TEXT),
         ]
         self.assertEqual(new_nodes, expected)
-        
+
+    def test_text_to_textnodes(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        nodes = text_to_textnodes(text)
+        expected =  [
+            TextNode("This is ", TextType.NORMAL_TEXT),
+            TextNode("text", TextType.BOLD_TEXT),
+            TextNode(" with an ", TextType.NORMAL_TEXT),
+            TextNode("italic", TextType.ITALIC_TEXT),
+            TextNode(" word and a ", TextType.NORMAL_TEXT),
+            TextNode("code block", TextType.CODE_TEXT),
+            TextNode(" and an ", TextType.NORMAL_TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.NORMAL_TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+        self.assertEqual(nodes, expected)
+
 
 if __name__ == '__main__':
     unittest.main()

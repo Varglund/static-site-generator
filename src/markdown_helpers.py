@@ -110,3 +110,11 @@ def split_nodes_image(old_nodes: List[TextNode]):
                     TextNode(line,TextType.NORMAL_TEXT)
                 )
     return new_nodes
+
+def text_to_textnodes(text:str):
+    node = TextNode(text, TextType.NORMAL_TEXT)
+    bolds = split_nodes_delimiter([node], Delimiter.BOLD, TextType.BOLD_TEXT)
+    italics = split_nodes_delimiter(bolds, Delimiter.ITALIC, TextType.ITALIC_TEXT)
+    code = split_nodes_delimiter(italics, Delimiter.CODE, TextType.CODE_TEXT)
+    links = split_nodes_link(code)
+    return split_nodes_image(links)
