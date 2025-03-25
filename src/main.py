@@ -1,8 +1,8 @@
-from textnode import TextNode, TextType
+from file_handling import recursive_copy
+import os
 
 def main():
-    dummy = TextNode("My name is chica chica Slim Shady", TextType.NORMAL_TEXT, "https://www.youtube.com/watch?v=QWcfbZPf2gk")
-    print(dummy)
+    recursive_copy(os.path.join(os.path.abspath("."),"static"), os.path.join(os.path.abspath("."),"public"))
     
 if __name__ == '__main__':
     main()
