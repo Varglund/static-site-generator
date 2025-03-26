@@ -3,7 +3,8 @@ from block_markdown import (
     markdown_to_html_node,
     markdown_to_blocks,
     block_to_block_type,
-    BlockType
+    BlockType,
+    extract_title
 )
 
 class TestBlockMarkdown(unittest.TestCase):
@@ -163,6 +164,22 @@ the **same** even with inline stuff
         self.assertEqual(
             html,
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
+        )
+
+    def test_extract_title(self):
+        md = """
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
+## Here is an H2 header before our
+# Title
+"""
+
+        title = extract_title(md)
+        self.assertEqual(
+            title,
+            "Title",
         )
 
 
