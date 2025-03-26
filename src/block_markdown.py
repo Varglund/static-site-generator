@@ -3,6 +3,7 @@ from enum import Enum
 from inline_markdown import text_to_textnodes
 from htmlnode import ParentNode
 from textnode import text_node_to_html_node, TextNode, TextType
+import re
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
@@ -12,16 +13,27 @@ class BlockType(Enum):
     UNORDERED_LIST = "unordered_list"
     ORDERED_LIST = "ordered_list"
 
+def extract_title(markdown:str)->str:
+    markdown_blocks = markdown_to_blocks(markdown)
+    block_types = list(map(block_to_block_type, markdown_blocks))
+    blocks_and_types = list(zip(markdown_blocks, block_types))
+    headings = [block for block, type in blocks_and_types if type == BlockType.HEADING]
+    html_heading_nodes = list(map(heading_to_html_node,headings))
+    h1_nodes = [node for node in html_heading_nodes if node.tag == "h1"]
+    print(h1_nodes)
+    title = h1_nodes[0].children[0].value
+    print(title)
+    return title
 
 def markdown_to_blocks(markdown:str)->List[str]:
     blocks = markdown.split(sep="\n\n")
     return [block.strip() for block in blocks if block != ""]
 
 def block_to_block_type(block)->BlockType:
-    heading = r"^#{1,6} (.*)$"
-    code = r"^```(.*?)```$"
-    quote = r"^>"
-    unordered_list = r"^[*-] .*$"
+    heading = re.compile(r"^#{1,6} (.*)$")
+    code = re.compile(r"^```(.*?)```$")
+    quote = re.compile(r"^>")
+    unordered_list = re.compile(r"^[*-] .*$")
 
     if heading.match(block):
         return BlockType.HEADING
@@ -50,7 +62,7 @@ def block_to_block_type(block)->BlockType:
     
     ordinal = 1
     for line in lines:
-        ordered_list = rf"^{ordinal}\. .*$"
+        ordered_list = re.compile(rf"^{ordinal}\. .*$")
         if not ordered_list.match(line):
             break
         ordinal += 1
@@ -150,3 +162,8 @@ def quote_to_html_node(block):
     content = " ".join(new_lines)
     children = text_to_children(content)
     return ParentNode("blockquote", children)
+
+
+
+if __name__=="__main__":
+    extract_title("""some plain text before a \n\n- bulleted\ni-list\n\n## H2 before title?\n\n# Title""")
