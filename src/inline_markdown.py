@@ -6,7 +6,7 @@ import re
 class Delimiter(Enum):
     ITALIC = "*"
     BOLD = "**"
-    CODE = "`"
+    CODE = "```"
 
 
 def split_nodes_delimiter(old_nodes: List[TextNode], delimiter: Delimiter, text_type: TextType):

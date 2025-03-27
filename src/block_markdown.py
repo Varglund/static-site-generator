@@ -20,9 +20,7 @@ def extract_title(markdown:str)->str:
     headings = [block for block, type in blocks_and_types if type == BlockType.HEADING]
     html_heading_nodes = list(map(heading_to_html_node,headings))
     h1_nodes = [node for node in html_heading_nodes if node.tag == "h1"]
-    print(h1_nodes)
     title = h1_nodes[0].children[0].value
-    print(title)
     return title
 
 def markdown_to_blocks(markdown:str)->List[str]:
@@ -87,9 +85,9 @@ def block_to_html_node(block):
         return heading_to_html_node(block)
     if block_type == BlockType.CODE:
         return code_to_html_node(block)
-    if block_type == BlockType.OLIST:
+    if block_type == BlockType.ORDERED_LIST:
         return olist_to_html_node(block)
-    if block_type == BlockType.ULIST:
+    if block_type == BlockType.UNORDERED_LIST:
         return ulist_to_html_node(block)
     if block_type == BlockType.QUOTE:
         return quote_to_html_node(block)
