@@ -4,7 +4,7 @@ from enum import Enum
 import re
 
 class Delimiter(Enum):
-    ITALIC = "*"
+    ITALIC = "_"
     BOLD = "**"
     CODE = "```"
 
