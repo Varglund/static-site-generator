@@ -14,7 +14,7 @@ from inline_markdown import (
 class TestInlineMarkdown(unittest.TestCase):
     def test_split_code(self):
         node = TextNode("This is text with a ```code block``` word", TextType.NORMAL_TEXT)
-        new_nodes = split_nodes_delimiter([node], Delimiter.CODE, TextType.CODE_TEXT)
+        new_nodes = split_nodes_delimiter([node], Delimiter.CODE_BLOCK, TextType.CODE_TEXT)
         expected = [
             TextNode("This is text with a ", TextType.NORMAL_TEXT),
             TextNode("code block", TextType.CODE_TEXT),

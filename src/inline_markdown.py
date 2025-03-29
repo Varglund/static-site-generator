@@ -6,7 +6,8 @@ import re
 class Delimiter(Enum):
     ITALIC = "_"
     BOLD = "**"
-    CODE = "```"
+    CODE_BLOCK = "```"
+    CODE_INLINE = "`"
 
 
 def split_nodes_delimiter(old_nodes: List[TextNode], delimiter: Delimiter, text_type: TextType):
@@ -23,8 +24,9 @@ def split_nodes_delimiter(old_nodes: List[TextNode], delimiter: Delimiter, text_
             new_nodes.extend([
                 TextNode(fragments[0],TextType.NORMAL_TEXT),
                 TextNode(fragments[1], text_type),
-                TextNode(fragments[2],TextType.NORMAL_TEXT),
             ])
+            remaining_node = [TextNode(fragments[2],TextType.NORMAL_TEXT)]
+            new_nodes.extend(split_nodes_delimiter(remaining_node,delimiter, text_type))
         elif no_frags == 1:
             new_nodes.append(node)
         else:
@@ -115,6 +117,7 @@ def text_to_textnodes(text:str):
     node = TextNode(text, TextType.NORMAL_TEXT)
     bolds = split_nodes_delimiter([node], Delimiter.BOLD, TextType.BOLD_TEXT)
     italics = split_nodes_delimiter(bolds, Delimiter.ITALIC, TextType.ITALIC_TEXT)
-    code = split_nodes_delimiter(italics, Delimiter.CODE, TextType.CODE_TEXT)
-    links = split_nodes_link(code)
+    code = split_nodes_delimiter(italics, Delimiter.CODE_BLOCK, TextType.CODE_TEXT)
+    code_inline = split_nodes_delimiter(code, Delimiter.CODE_INLINE, TextType.CODE_TEXT)
+    links = split_nodes_link(code_inline)
     return split_nodes_image(links)

@@ -23,9 +23,6 @@ def extract_title(markdown:str)->str:
     title = h1_nodes[0].children[0].value
     return title
 
-def markdown_to_blocks(markdown:str)->List[str]:
-    blocks = markdown.split(sep="\n\n")
-    return [block.strip() for block in blocks if block != ""]
 
 def block_to_block_type(block)->BlockType:
     heading = re.compile(r"^#{1,6} (.*)$")
@@ -68,6 +65,10 @@ def block_to_block_type(block)->BlockType:
         return BlockType.ORDERED_LIST
     
     return BlockType.PARAGRAPH
+
+def markdown_to_blocks(markdown:str)->List[str]:
+    blocks = markdown.split(sep="\n\n")
+    return [block.strip() for block in blocks if block != ""]
 
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
@@ -123,8 +124,8 @@ def heading_to_html_node(block):
 def code_to_html_node(block):
     if not block.startswith("```") or not block.endswith("```"):
         raise ValueError("invalid code block")
-    text = block[4:-3]
-    raw_text_node = TextNode(text, TextType.TEXT)
+    text = block[3:-3]
+    raw_text_node = TextNode(text, TextType.NORMAL_TEXT)
     child = text_node_to_html_node(raw_text_node)
     code = ParentNode("code", [child])
     return ParentNode("pre", [code])
