@@ -17,7 +17,7 @@ def split_nodes_delimiter(old_nodes: List[TextNode], delimiter: Delimiter, text_
         if node.text_type != TextType.NORMAL_TEXT:
             new_nodes.append(node)
             continue
-        fragments = node.text.split(sep=delimiter.value, maxsplit=3)
+        fragments = node.text.split(sep=delimiter.value, maxsplit=2)
         no_frags = len(fragments)
         if no_frags==3:
             new_nodes.extend([

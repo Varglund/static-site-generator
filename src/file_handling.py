@@ -2,6 +2,8 @@ import os
 import shutil
 from block_markdown import markdown_to_html_node, extract_title
 
+TEMPLATE_PATH = os.path.join(os.path.relpath("."),"template.html")
+
 def generate_page(from_path, template_path, dest_path)->None:
     print(f"Generating page from {from_path} to {dest_path} using {template_path}.")
     with open(from_path) as fp:
@@ -14,8 +16,9 @@ def generate_page(from_path, template_path, dest_path)->None:
                     .replace("{{ Title }}", title)
                     .replace("{{ Content }}", contents_html)
                     )
-    if not os.path.exists(os.path.join("public")):
-        os.mkdir(os.path.join("public"))
+    dest_dir_path = os.path.join("public")
+    if dest_dir_path != "":
+        os.makedirs(dest_dir_path, exist_ok=True)
     with open(dest_path, "w") as fp:
         fp.write(contents_html)
     return None
@@ -28,7 +31,9 @@ def copy_files_recursive(source_dir_path, dest_dir_path):
         from_path = os.path.join(source_dir_path, filename)
         dest_path = os.path.join(dest_dir_path, filename)
         print(f" * {from_path} -> {dest_path}")
-        if os.path.isfile(from_path):
-            shutil.copy(from_path, dest_path)
-        else:
+        if not os.path.isfile(from_path):
             copy_files_recursive(from_path, dest_path)
+        elif from_path.endswith(".md"):
+            generate_page(from_path, TEMPLATE_PATH, dest_path.replace(".md",".html"))
+        else:
+            shutil.copy(from_path,dest_path)
