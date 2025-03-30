@@ -8,11 +8,10 @@ def main():
         BASEPATH = "/"
     else:
         BASEPATH = sys.argv[1]
-    if os.path.exists(os.path.join(BASEPATH,"public")):
-        shutil.rmtree(os.path.join(BASEPATH,"public"))
-    copy_files_recursive(os.path.join(BASEPATH,"static"), os.path.join(BASEPATH,"public"), BASEPATH)
-    copy_files_recursive(os.path.join(BASEPATH,"content"), os.path.join(BASEPATH,"public"), BASEPATH)
-    os.path.split()
+    if os.path.exists(os.path.join("docs")):
+        shutil.rmtree(os.path.join("docs"))
+    copy_files_recursive(os.path.join("static"), os.path.join("docs"), BASEPATH)
+    copy_files_recursive(os.path.join("content"), os.path.join("docs"), BASEPATH)
     
 if __name__ == '__main__':
     main()
